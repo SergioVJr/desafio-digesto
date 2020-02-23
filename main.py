@@ -29,6 +29,19 @@ class Machine:
             json_str = json.dumps([m.__dict__ for m in m_list])
             file.write(json_str)
 
+    @staticmethod
+    def save_csv(m_list: List[Machine]) -> None:
+        """Store a list of Machines as a CSV file"""
+        with open("machines.csv", 'w', newline='') as file:
+            writer = csv.DictWriter(file, fieldnames=["cpu", "memory", "storage", "bandwidth", "price"])
+            writer.writerow({"cpu": "CPU/vCPU",
+                             "memory": "Memory",
+                             "storage": "SSD",
+                             "bandwidth": "Bandwidth",
+                             "price": "Price"})
+            for m in m_list:
+                writer.writerow(m.__dict__)
+
 
 def vultr_scraper() -> List[Machine]:
     """Obtain a list of cloud machines from https://www.vultr.com/pricing/"""
@@ -59,3 +72,5 @@ if __name__ == "__main__":
         Machine.print_list(machines)
     if "--save_json" in sys.argv:
         Machine.save_json(machines)
+    if "--save_csv" in sys.argv:
+        Machine.save_csv(machines)
