@@ -22,6 +22,13 @@ class Machine:
         for m in m_list:
             print(format_str.format(m.cpu, m.memory, m.storage, m.bandwidth, m.price))
 
+    @staticmethod
+    def save_json(m_list: List[Machine]) -> None:
+        """Store a list of Machines as a JSON file"""
+        with open("machines.json", 'w') as file:
+            json_str = json.dumps([m.__dict__ for m in m_list])
+            file.write(json_str)
+
 
 def vultr_scraper() -> List[Machine]:
     """Obtain a list of cloud machines from https://www.vultr.com/pricing/"""
@@ -50,3 +57,5 @@ if __name__ == "__main__":
 
     if "--print" in sys.argv:
         Machine.print_list(machines)
+    if "--save_json" in sys.argv:
+        Machine.save_json(machines)
