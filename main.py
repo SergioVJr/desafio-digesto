@@ -65,8 +65,31 @@ def vultr_scraper() -> List[Machine]:
     return m_list
 
 
+def digitalocean_scraper() -> List[Machine]:
+    """Obtain a list of cloud machines from https://www.digitalocean.com/pricing/"""
+    page = requests.get("https://www.digitalocean.com/pricing/")
+    tree = html.fromstring(page.content)
+
+    # Extract the rows from the pricing table
+    rows = tree.xpath('//div[@id="standard-droplets-pricing-table"]//table[@class="www-Table PricingTable"]/tbody/tr')
+
+    m_list = []
+    for row in rows:
+        m = Machine()
+        columns = row.xpath('.//td')
+        m.memory = columns[0][0].text.strip()
+        m.cpu = columns[1].text.strip()
+        m.bandwidth = columns[2].text.strip()
+        m.storage = columns[3].text.strip().replace(',', '')
+        m.price = columns[4][0].text.strip()
+        m_list.append(m)
+
+    return m_list
+
+
 if __name__ == "__main__":
     machines = vultr_scraper()
+    machines.extend(digitalocean_scraper())
 
     if "--print" in sys.argv:
         Machine.print_list(machines)
